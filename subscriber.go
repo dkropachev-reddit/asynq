@@ -5,10 +5,10 @@
 package asynq
 
 import (
+	"github.com/go-redis/redis/v7"
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v7"
 	"github.com/hibiken/asynq/internal/base"
 	"github.com/hibiken/asynq/internal/log"
 )
@@ -80,6 +80,9 @@ func (s *subscriber) start(wg *sync.WaitGroup) {
 				s.logger.Debug("Subscriber done")
 				return
 			case msg := <-cancelCh:
+				if msg == nil {
+					continue
+				}
 				cancel, ok := s.cancelations.Get(msg.Payload)
 				if ok {
 					cancel()
